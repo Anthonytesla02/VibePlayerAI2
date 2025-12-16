@@ -7,7 +7,7 @@ workflows:
       node: 20
       java: 17
       android_signing:
-        - keystore_reference
+        - vibeplay_keystore
       vars:
         PACKAGE_NAME: "com.vibeplay.app"
     scripts:
@@ -27,11 +27,11 @@ workflows:
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
 
-      - name: Build Android Debug APK
+      - name: Build Android Release APK
         script: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease
 
     artifacts:
       - android/app/build/outputs/**/*.apk

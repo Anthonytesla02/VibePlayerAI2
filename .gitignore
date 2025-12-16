@@ -30,3 +30,7 @@ android/build/
 android/local.properties
 *.apk
 *.aab
+
+# Keystore files - DO NOT COMMIT to public repos
+# Note: vibeplay-release.keystore is intentionally tracked for Codemagic
+keystore.properties
