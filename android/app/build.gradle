@@ -6,21 +6,18 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def cmKeystorePath = System.getenv("CM_KEYSTORE_PATH")
-def cmKeystorePassword = System.getenv("CM_KEYSTORE_PASSWORD")
-def cmKeyAlias = System.getenv("CM_KEY_ALIAS")
-def cmKeyPassword = System.getenv("CM_KEY_PASSWORD")
-
-def hasCodemagicSigning = cmKeystorePath && cmKeystorePassword && cmKeyAlias && cmKeyPassword
-def hasLocalSigning = keystorePropertiesFile.exists() && 
-    keystoreProperties['storeFile'] && 
-    keystoreProperties['storePassword'] && 
-    keystoreProperties['keyAlias'] && 
-    keystoreProperties['keyPassword']
-
 android {
     namespace "com.vibeplay.app"
     compileSdk rootProject.ext.compileSdkVersion
+
+    signingConfigs {
+        release {
+            storeFile file("../vibeplay-release.keystore")
+            storePassword "VibePlay2025Secure"
+            keyAlias "vibeplay"
+            keyPassword "VibePlay2025Secure"
+        }
+    }
 
     defaultConfig {
         applicationId "com.vibeplay.app"
@@ -38,30 +35,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
-}
-
-if (hasCodemagicSigning) {
-    android.signingConfigs {
-        release {
-            storeFile file(cmKeystorePath)
-            storePassword cmKeystorePassword
-            keyAlias cmKeyAlias
-            keyPassword cmKeyPassword
-        }
-    }
-    android.buildTypes.release.signingConfig = android.signingConfigs.release
-} else if (hasLocalSigning) {
-    android.signingConfigs {
-        release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-        }
-    }
-    android.buildTypes.release.signingConfig = android.signingConfigs.release
 }
 
 repositories {
