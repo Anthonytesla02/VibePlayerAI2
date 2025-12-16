@@ -7,6 +7,7 @@ import { WaveformVisualizer } from '@/components/WaveformVisualizer';
 import { PlayerControls } from '@/components/PlayerControls';
 import { SongList } from '@/components/SongList';
 import { FileUpload } from '@/components/FileUpload';
+import { YouTubeImport } from '@/components/YouTubeImport';
 import { VibeDetector } from '@/components/VibeDetector';
 import { SearchBar } from '@/components/SearchBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -159,7 +160,10 @@ const Index = () => {
                 onChange={setSearchQuery}
                 placeholder="Search songs..."
               />
-              <FileUpload onFileSelect={handleFileUpload} />
+              <div className="space-y-2">
+                <FileUpload onFileSelect={handleFileUpload} />
+                <YouTubeImport onImport={handleFileUpload} />
+              </div>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
