@@ -6,10 +6,12 @@ workflows:
     environment:
       node: 20
       java: 17
-      android_signing:
-        - vibeplay_keystore
       vars:
         PACKAGE_NAME: "com.vibeplay.app"
+        CM_KEYSTORE_PATH: "$CM_BUILD_DIR/android/app/vibeplay-release.keystore"
+        CM_KEYSTORE_PASSWORD: "vibeplay123"
+        CM_KEY_ALIAS: "vibeplay"
+        CM_KEY_PASSWORD: "vibeplay123"
     scripts:
       - name: Install dependencies
         script: |

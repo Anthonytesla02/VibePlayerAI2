@@ -1,82 +1,43 @@
 # Codemagic Android Build Setup
 
-This guide explains how to configure Codemagic.io to build signed Android APKs for VibePlay.
+The project is now configured to build signed Android APKs automatically - no manual keystore upload needed!
 
-## Keystore Information
+## How It Works
 
-A keystore file has been created at `android/app/vibeplay-release.keystore` with the following credentials:
+The keystore file (`android/app/vibeplay-release.keystore`) is included in the repository, and the `codemagic.yaml` is configured to use it directly with environment variables.
 
+## Keystore Credentials (for reference)
+
+- **Keystore File:** `android/app/vibeplay-release.keystore`
 - **Keystore Password:** `vibeplay123`
 - **Key Alias:** `vibeplay`
 - **Key Password:** `vibeplay123`
 
-> **IMPORTANT:** For production apps, you should generate a new keystore with a strong, unique password and keep it secure. Never share your production keystore passwords publicly.
+> **IMPORTANT:** For production apps, you should generate a new keystore with strong, unique passwords. Consider using Codemagic's encrypted environment variables for production credentials.
 
-## Setting Up Codemagic
+## Building on Codemagic
 
-### Step 1: Add the Keystore to Codemagic
+1. Push your code to GitHub
+2. In Codemagic, click "Start new build"
+3. Select the `android-workflow` workflow
+4. The build will automatically sign the APK using the keystore in the repository
 
-1. Log in to [Codemagic.io](https://codemagic.io)
-2. Go to your app's settings
-3. Navigate to **Code signing identities** (or **Android code signing**)
-4. Click **Add keystore**
-5. Upload the `android/app/vibeplay-release.keystore` file from this project
-6. Fill in the details:
-   - **Reference name:** `vibeplay_keystore` (must match the name in codemagic.yaml)
-   - **Keystore password:** `vibeplay123`
-   - **Key alias:** `vibeplay`
-   - **Key password:** `vibeplay123`
-7. Save the keystore
+## Security Note
 
-### Step 2: Verify codemagic.yaml
+For enhanced security in production:
+1. Go to **Team settings** > **Global variables & secrets**
+2. Add these as encrypted variables:
+   - `CM_KEYSTORE_PASSWORD`
+   - `CM_KEY_PASSWORD`
+3. Remove the plaintext passwords from `codemagic.yaml`
 
-The `codemagic.yaml` file is already configured to use `vibeplay_keystore` as the signing reference:
+## Local Development
 
-```yaml
-environment:
-  android_signing:
-    - vibeplay_keystore
-```
+For local release builds:
 
-### Step 3: Start a Build
-
-1. Push your code to your repository
-2. In Codemagic, start a new build
-3. The build will automatically:
-   - Install npm dependencies
-   - Build the web app
-   - Sync with Capacitor
-   - Build a signed release APK
-
-## Local Development Signing (Optional)
-
-For local release builds, create `android/keystore.properties`:
-
-```properties
-storeFile=app/vibeplay-release.keystore
-storePassword=vibeplay123
-keyAlias=vibeplay
-keyPassword=vibeplay123
-```
-
-Then run:
 ```bash
 cd android
 ./gradlew assembleRelease
 ```
 
-## Troubleshooting
-
-### "No suitable keystores found matching reference"
-
-This error means the keystore reference in `codemagic.yaml` doesn't match any keystore uploaded to Codemagic. Make sure:
-
-1. The keystore is uploaded to Codemagic
-2. The reference name matches exactly (case-sensitive): `vibeplay_keystore`
-
-### Build fails with signing errors
-
-Verify that:
-- The keystore password is correct
-- The key alias matches (`vibeplay`)
-- The key password is correct
+The build.gradle is configured to use the keystore with the environment variables.
