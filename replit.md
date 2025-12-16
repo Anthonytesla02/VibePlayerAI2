@@ -9,6 +9,7 @@ VibePlay is a music player application with AI-powered vibe detection features. 
 - **State Management**: TanStack React Query
 - **Backend**: Supabase (Auth, Database, Storage)
 - **Animation**: Framer Motion
+- **Mobile**: Capacitor 6 (Android)
 
 ## Project Structure
 ```
@@ -35,6 +36,10 @@ src/
 │   └── NotFound.tsx    # 404 page
 └── types/
     └── music.ts        # TypeScript types
+
+android/                 # Capacitor Android project
+codemagic.yaml          # CodeMagic CI/CD configuration
+capacitor.config.ts     # Capacitor configuration
 ```
 
 ## Environment Variables
@@ -44,6 +49,17 @@ src/
 
 ## Running the Application
 The app runs on port 5000 using `npm run dev`.
+
+## Android Build (CodeMagic)
+1. Push this repository to GitHub/GitLab/Bitbucket
+2. Connect to CodeMagic.io
+3. CodeMagic will use `codemagic.yaml` to build the APK
+4. The APK will be available in the artifacts after build
+
+### Local Android Scripts
+- `npm run cap:build` - Build web app and sync to Android
+- `npm run cap:sync` - Sync web assets to Android
+- `npm run android:open` - Open Android project in Android Studio
 
 ## Deployment
 Configured for static deployment with `npm run build` outputting to the `dist/` directory.
@@ -56,3 +72,4 @@ Configured for static deployment with `npm run build` outputting to the `dist/` 
 - AI-powered vibe/mood detection
 - Waveform visualization
 - Responsive mobile-first design
+- Android APK builds via CodeMagic
