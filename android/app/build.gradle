@@ -6,25 +6,21 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def cmKeystorePath = System.getenv("CM_KEYSTORE_PATH")
+def cmKeystorePassword = System.getenv("CM_KEYSTORE_PASSWORD")
+def cmKeyAlias = System.getenv("CM_KEY_ALIAS")
+def cmKeyPassword = System.getenv("CM_KEY_PASSWORD")
+
+def hasCodemagicSigning = cmKeystorePath && cmKeystorePassword && cmKeyAlias && cmKeyPassword
+def hasLocalSigning = keystorePropertiesFile.exists() && 
+    keystoreProperties['storeFile'] && 
+    keystoreProperties['storePassword'] && 
+    keystoreProperties['keyAlias'] && 
+    keystoreProperties['keyPassword']
+
 android {
     namespace "com.vibeplay.app"
     compileSdk rootProject.ext.compileSdkVersion
-
-    signingConfigs {
-        release {
-            if (System.getenv("CM_KEYSTORE_PATH")) {
-                storeFile file(System.getenv("CM_KEYSTORE_PATH"))
-                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
-                keyAlias System.getenv("CM_KEY_ALIAS")
-                keyPassword System.getenv("CM_KEY_PASSWORD")
-            } else if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-            }
-        }
-    }
 
     defaultConfig {
         applicationId "com.vibeplay.app"
@@ -34,20 +30,38 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (signingConfigs.release.storeFile != null) {
-                signingConfig signingConfigs.release
-            }
         }
     }
+}
+
+if (hasCodemagicSigning) {
+    android.signingConfigs {
+        release {
+            storeFile file(cmKeystorePath)
+            storePassword cmKeystorePassword
+            keyAlias cmKeyAlias
+            keyPassword cmKeyPassword
+        }
+    }
+    android.buildTypes.release.signingConfig = android.signingConfigs.release
+} else if (hasLocalSigning) {
+    android.signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+    android.buildTypes.release.signingConfig = android.signingConfigs.release
 }
 
 repositories {
