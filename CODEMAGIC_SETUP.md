@@ -1,43 +1,61 @@
 # Codemagic Android Build Setup
 
-The project is now configured to build signed Android APKs automatically - no manual keystore upload needed!
+The project is configured to build signed Android APKs automatically.
 
-## How It Works
+## Keystore Information
 
-The keystore file (`android/app/vibeplay-release.keystore`) is included in the repository, and the `codemagic.yaml` is configured to use it directly with environment variables.
+A keystore file is included at `android/app/vibeplay-release.keystore`.
 
-## Keystore Credentials (for reference)
+## Setting Up Codemagic Environment Variables
 
-- **Keystore File:** `android/app/vibeplay-release.keystore`
-- **Keystore Password:** `vibeplay123`
-- **Key Alias:** `vibeplay`
-- **Key Password:** `vibeplay123`
+Before building, you need to add the keystore credentials as environment variables in Codemagic:
 
-> **IMPORTANT:** For production apps, you should generate a new keystore with strong, unique passwords. Consider using Codemagic's encrypted environment variables for production credentials.
+1. Go to your app in Codemagic
+2. Click on **Environment variables** tab
+3. Add the following variables under a group named `keystore_credentials`:
 
-## Building on Codemagic
+| Variable Name | Value |
+|--------------|-------|
+| `CM_KEYSTORE_PASSWORD` | `vibeplay123` |
+| `CM_KEY_ALIAS` | `vibeplay` |
+| `CM_KEY_PASSWORD` | `vibeplay123` |
+
+4. Mark all three as **Secure** (encrypted)
+5. Save the changes
+
+## Building
 
 1. Push your code to GitHub
 2. In Codemagic, click "Start new build"
 3. Select the `android-workflow` workflow
-4. The build will automatically sign the APK using the keystore in the repository
+4. The build will automatically:
+   - Install npm dependencies
+   - Build the web app
+   - Sync with Capacitor
+   - Build a signed release APK
 
 ## Security Note
 
-For enhanced security in production:
-1. Go to **Team settings** > **Global variables & secrets**
-2. Add these as encrypted variables:
-   - `CM_KEYSTORE_PASSWORD`
-   - `CM_KEY_PASSWORD`
-3. Remove the plaintext passwords from `codemagic.yaml`
+For production apps:
+- Generate a new keystore with a strong, unique password
+- Never commit the keystore passwords to version control
+- Use Codemagic's encrypted environment variables
 
 ## Local Development
 
-For local release builds:
+For local release builds, you can create `android/keystore.properties`:
 
+```properties
+storeFile=app/vibeplay-release.keystore
+storePassword=vibeplay123
+keyAlias=vibeplay
+keyPassword=vibeplay123
+```
+
+Then run:
 ```bash
+npm run build
+npx cap sync android
 cd android
 ./gradlew assembleRelease
 ```
-
-The build.gradle is configured to use the keystore with the environment variables.
